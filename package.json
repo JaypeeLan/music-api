@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "start": "node build/app.js",
+    "build": "tsc",
+    "dev": "nodemon src/app.ts",
+    "watch": "tsc -w"
+  },
   "dependencies": {
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
