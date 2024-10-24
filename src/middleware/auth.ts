@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/User";
 import { createError } from "../utils/error";
+import config from "../config";
 
 interface AuthenticatedRequest extends Request {
   user?: any;
@@ -19,10 +20,7 @@ export const auth = async (
       throw createError("Authentication required", 401);
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your-secret-key"
-    ) as { userId: string };
+    const decoded = jwt.verify(token, config.jwt || "") as { userId: string };
 
     const user = await UserModel.findById(decoded.userId);
 

@@ -5,15 +5,16 @@ import jwt from "jsonwebtoken";
 import { createError } from "../utils/error";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import config from "../config";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const JWT_SECRET = config.jwt || "";
 const JWT_EXPIRES_IN = "24h";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: config.emailUsername,
+    pass: config.emailPassword,
   },
 });
 
@@ -201,7 +202,7 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: config.emailUsername,
       to: user.email,
       subject: "Password Reset Request",
       html: `<p>You requested a password reset. Click the link below to reset your password:</p>

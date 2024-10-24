@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../constants";
+import config from "../config";
 
 export const errorHandler = (
   err: Error | ApiError,
@@ -37,7 +38,7 @@ export const errorHandler = (
   }
 
   // Development vs Production error response
-  if (process.env.NODE_ENV === "development") {
+  if (config.env === "development") {
     res.status(statusCode).json({
       success: false,
       error: {

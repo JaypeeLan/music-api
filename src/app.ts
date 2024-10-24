@@ -6,16 +6,8 @@ import morgan from "morgan";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler";
 import { errorLogger } from "./middleware/errorLogger";
 import helmet from "helmet";
-import SpotifyWebApi from "spotify-web-api-node";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.SPOTIFY_REDIRECT_URI,
-});
+import "dotenv/config";
+import config from "./config";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -42,7 +34,7 @@ connectDB().then(() => {
   console.log("Database connected");
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = config.port || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
