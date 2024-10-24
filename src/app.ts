@@ -7,16 +7,9 @@ import { notFoundHandler, errorHandler } from "./middleware/errorHandler";
 import { errorLogger } from "./middleware/errorLogger";
 import helmet from "helmet";
 import SpotifyWebApi from "spotify-web-api-node";
-import {
-  searchMusics,
-  searchAlbums,
-  searchPlaylists,
-  getSuggestions,
-  listMusicsFromAlbum,
-  listMusicsFromPlaylist,
-  searchArtists,
-  getArtist,
-} from "node-youtube-music";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,

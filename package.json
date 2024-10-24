@@ -1,10 +1,9 @@
 {
   "name": "music",
   "version": "1.0.0",
-  "main": "build/app.js",
-  "type": "module",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "npm run build && node build/app.js",
+    "start": "node dist/app.js",
     "build": "tsc",
     "dev": "nodemon src/app.ts",
     "watch": "tsc -w"
