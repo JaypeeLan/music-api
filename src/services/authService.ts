@@ -71,21 +71,16 @@ export const register = async (
 
     const hashedPassword = await bcrypt.hash(password!, 10);
 
-    // Initialize user with empty tokens array
     const user = await UserModel.create({
       ...userData,
       password: hashedPassword,
-      tokens: [],
+      token: null,
     });
 
     const token = generateToken(user.id);
 
     // Update user with the new token
-    await UserModel.findByIdAndUpdate(
-      user.id,
-      { $push: { tokens: token } },
-      { new: true }
-    );
+    await UserModel.findByIdAndUpdate(user.id, { token }, { new: true });
 
     return {
       message: "User registered successfully",
@@ -127,17 +122,8 @@ export const login = async (
 
     const token = generateToken(user.id);
 
-    // Initialize tokens array if it doesn't exist
-    if (!Array.isArray(user.tokens)) {
-      user.tokens = [];
-    }
-
     // Update user with the new token
-    await UserModel.findByIdAndUpdate(
-      user.id,
-      { $push: { tokens: token } },
-      { new: true }
-    );
+    await UserModel.findByIdAndUpdate(user.id, { token }, { new: true });
 
     return {
       message: "Login successful",
@@ -155,24 +141,15 @@ export const login = async (
   }
 };
 
-export const logout = async (userId: string, token: string): Promise<void> => {
+export const logout = async (userId: string): Promise<void> => {
   try {
     const user = await UserModel.findById(userId);
     if (!user) {
       throw createError("User not found", 404);
     }
 
-    // Initialize tokens array if it doesn't exist
-    if (!Array.isArray(user.tokens)) {
-      user.tokens = [];
-    }
-
-    // Update user by removing the token
-    await UserModel.findByIdAndUpdate(
-      userId,
-      { $pull: { tokens: token } },
-      { new: true }
-    );
+    // Clear the existing token
+    await UserModel.findByIdAndUpdate(userId, { token: null }, { new: true });
   } catch (error) {
     if (error instanceof Error) {
       throw createError(

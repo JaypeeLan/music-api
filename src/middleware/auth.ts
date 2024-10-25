@@ -24,7 +24,7 @@ export const auth = async (
 
     const user = await UserModel.findById(decoded.userId);
 
-    if (!user || !user.tokens.includes(token)) {
+    if (!user) {
       throw createError("Authentication required", 401);
     }
 

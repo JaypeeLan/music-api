@@ -8,7 +8,7 @@ export interface User {
   password: string;
   createdAt: Date;
   updatedAt: Date;
-  tokens: string[];
+  // tokens: string[];
   resetPasswordToken?: string;
   resetPasswordExpires?: Date | number;
   dateOfBirth: string;
