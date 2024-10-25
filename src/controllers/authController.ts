@@ -76,7 +76,7 @@ export const logout = asyncHandler(
       throwAuthenticationError("User not authenticated");
     }
 
-    if (req.user && token) await authService.logout(req.user.userId, token);
+    if (req.user && token) await authService.logout(req.user.userId);
     res.json({ message: "Logged out successfully" });
   }
 );
