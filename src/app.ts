@@ -4,7 +4,6 @@ import { connectDB } from "./config/database";
 import routes from "./routes";
 import morgan from "morgan";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler";
-import { errorLogger } from "./middleware/errorLogger";
 import helmet from "helmet";
 import "dotenv/config";
 import config from "./config";
@@ -23,8 +22,6 @@ app.use(morgan("dev"));
 app.use("/api", routes);
 
 app.use(notFoundHandler);
-
-app.use(errorLogger);
 
 // Error handling (should be last middleware)
 app.use(errorHandler);

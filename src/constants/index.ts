@@ -12,7 +12,7 @@ export interface User {
   resetPasswordToken?: string;
   resetPasswordExpires?: Date | number;
   dateOfBirth: string;
-  gender: "male" | "female" | "none";
+  gender: string;
 }
 
 export interface Playlist {
