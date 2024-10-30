@@ -1,9 +1,32 @@
 import getAccessToken from "../services/musicService";
-import { createError } from "../utils/error"; // Import custom error creator
+import { createError } from "../utils/error";
 import { Request, Response } from "express";
 
+interface SpotifyTrack {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  image: string;
+  preview_url: string;
+}
+
+interface SpotifyCategory {
+  id: string;
+  name: string;
+  href: string;
+}
+
+interface SpotifyAlbum {
+  id: string;
+  name: string;
+  artist: string;
+  release_date: string;
+  image: string;
+}
+
 // Helper function to handle Spotify API requests
-const handleSpotifyResponse = async (response: Response) => {
+const handleSpotifyResponse = async (response: globalThis.Response) => {
   if (!response.ok) {
     const errorData = await response.json();
     const message = errorData?.error?.message || "Spotify API Error";
@@ -30,14 +53,16 @@ export const searchTracks = async (req: Request, res: Response) => {
     );
 
     const data = await handleSpotifyResponse(response);
-    const tracks = data.tracks.items.map((track: any) => ({
-      id: track.id,
-      title: track.name,
-      artist: track.artists[0].name,
-      album: track.album.name,
-      image: track.album.images[1]?.url,
-      preview_url: track.preview_url,
-    }));
+    const tracks = data.tracks.items.map(
+      (track: any): SpotifyTrack => ({
+        id: track.id,
+        title: track.name,
+        artist: track.artists[0].name,
+        album: track.album.name,
+        image: track.album.images[1]?.url,
+        preview_url: track.preview_url,
+      })
+    );
 
     res.json(tracks);
   } catch (error: any) {
@@ -61,11 +86,13 @@ export const getCategories = async (req: Request, res: Response) => {
     );
 
     const data = await handleSpotifyResponse(response);
-    const categories = data.categories.items.map((category: any) => ({
-      id: category.id,
-      name: category.name,
-      href: category.href,
-    }));
+    const categories = data.categories.items.map(
+      (category: any): SpotifyCategory => ({
+        id: category.id,
+        name: category.name,
+        href: category.href,
+      })
+    );
 
     res.json(categories);
   } catch (error: any) {
@@ -89,13 +116,15 @@ export const getNewReleases = async (req: Request, res: Response) => {
     );
 
     const data = await handleSpotifyResponse(response);
-    const newReleases = data.albums.items.map((album: any) => ({
-      id: album.id,
-      name: album.name,
-      artist: album.artists[0].name,
-      release_date: album.release_date,
-      image: album.images[1]?.url,
-    }));
+    const newReleases = data.albums.items.map(
+      (album: any): SpotifyAlbum => ({
+        id: album.id,
+        name: album.name,
+        artist: album.artists[0].name,
+        release_date: album.release_date,
+        image: album.images[1]?.url,
+      })
+    );
 
     res.json(newReleases);
   } catch (error: any) {
@@ -104,8 +133,7 @@ export const getNewReleases = async (req: Request, res: Response) => {
   }
 };
 
-// Get Category by ID
-export const getCategoryById = async (req: any, res: any) => {
+export const getCategoryById = async (req: Request, res: Response) => {
   let accessToken: string | null = null;
   try {
     if (!accessToken) {
@@ -121,16 +149,15 @@ export const getCategoryById = async (req: any, res: any) => {
       }
     );
 
-    const category = await response.json();
+    const category = await handleSpotifyResponse(response);
     res.json(category);
   } catch (error: any) {
-    console.error("Error fetching new releases:", error);
+    console.error("Error fetching category by ID:", error);
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
-// Get Track by ID
-export const getTrackById = async (req: any, res: any) => {
+export const getTrackById = async (req: Request, res: Response) => {
   let accessToken: string | null = null;
   try {
     if (!accessToken) {
@@ -143,10 +170,10 @@ export const getTrackById = async (req: any, res: any) => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    const track = await response.json();
+    const track = await handleSpotifyResponse(response);
     res.json(track);
   } catch (error: any) {
-    console.error("Error fetching new releases:", error);
+    console.error("Error fetching track by ID:", error);
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
