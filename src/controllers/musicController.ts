@@ -1,6 +1,19 @@
 import getAccessToken from "../services/musicService";
+import { createError } from "../utils/error"; // Import custom error creator
+import { Request, Response } from "express";
 
-export const searchTracks = async (req: any, res: any) => {
+// Helper function to handle Spotify API requests
+const handleSpotifyResponse = async (response: Response) => {
+  if (!response.ok) {
+    const errorData = await response.json();
+    const message = errorData?.error?.message || "Spotify API Error";
+    const statusCode = response.status;
+    throw createError(message, statusCode);
+  }
+  return response.json();
+};
+
+export const searchTracks = async (req: Request, res: Response) => {
   let accessToken: string | null = null;
   try {
     if (!accessToken) {
@@ -9,15 +22,14 @@ export const searchTracks = async (req: any, res: any) => {
 
     const response = await fetch(
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-        req.query.q
+        req.query.q as string
       )}&type=track&limit=20`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
 
-    const data = await response.json();
-
+    const data = await handleSpotifyResponse(response);
     const tracks = data.tracks.items.map((track: any) => ({
       id: track.id,
       title: track.name,
@@ -29,13 +41,12 @@ export const searchTracks = async (req: any, res: any) => {
 
     res.json(tracks);
   } catch (error: any) {
-    console.error("Error searching:", error);
-    res.status(500).json({ error: error?.message });
+    console.error("Error searching tracks:", error);
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
-// Get Categories
-export const getCategories = async (req: any, res: any) => {
+export const getCategories = async (req: Request, res: Response) => {
   let accessToken: string | null = null;
   try {
     if (!accessToken) {
@@ -49,7 +60,7 @@ export const getCategories = async (req: any, res: any) => {
       }
     );
 
-    const data = await response.json();
+    const data = await handleSpotifyResponse(response);
     const categories = data.categories.items.map((category: any) => ({
       id: category.id,
       name: category.name,
@@ -59,12 +70,11 @@ export const getCategories = async (req: any, res: any) => {
     res.json(categories);
   } catch (error: any) {
     console.error("Error fetching categories:", error);
-    res.status(500).json({ error: error?.message });
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
-// Get New Releases (Albums)
-export const getNewReleases = async (req: any, res: any) => {
+export const getNewReleases = async (req: Request, res: Response) => {
   let accessToken: string | null = null;
   try {
     if (!accessToken) {
@@ -78,7 +88,7 @@ export const getNewReleases = async (req: any, res: any) => {
       }
     );
 
-    const data = await response.json();
+    const data = await handleSpotifyResponse(response);
     const newReleases = data.albums.items.map((album: any) => ({
       id: album.id,
       name: album.name,
@@ -90,7 +100,7 @@ export const getNewReleases = async (req: any, res: any) => {
     res.json(newReleases);
   } catch (error: any) {
     console.error("Error fetching new releases:", error);
-    res.status(500).json({ error: error?.message });
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
@@ -114,8 +124,8 @@ export const getCategoryById = async (req: any, res: any) => {
     const category = await response.json();
     res.json(category);
   } catch (error: any) {
-    console.error("Error fetching category by ID:", error);
-    res.status(500).json({ error: error?.message });
+    console.error("Error fetching new releases:", error);
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
@@ -136,7 +146,7 @@ export const getTrackById = async (req: any, res: any) => {
     const track = await response.json();
     res.json(track);
   } catch (error: any) {
-    console.error("Error fetching track by ID:", error);
-    res.status(500).json({ error: error?.message });
+    console.error("Error fetching new releases:", error);
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };

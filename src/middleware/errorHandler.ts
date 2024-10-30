@@ -13,7 +13,7 @@ export const errorHandler = (
   let message = "Internal Server Error";
   let validation: Record<string, string> | undefined;
 
-  // If it's our custom ApiError
+  // Handle specific error types
   if ("statusCode" in err) {
     statusCode = err.statusCode;
     message = err.message;
@@ -22,7 +22,15 @@ export const errorHandler = (
     message = err.message;
   }
 
-  // Handle specific error types
+  // MongoDB duplicate key error (code 11000)
+  if ((err as any).code === 11000) {
+    statusCode = 400;
+    const duplicatedField = Object.keys((err as any).keyValue)[0];
+    message = `${duplicatedField} already exists`;
+    validation = { [duplicatedField]: message };
+  }
+
+  // Handle other specific error names
   switch (err.name) {
     case "ValidationError": // Mongoose validation error
       statusCode = 400;
@@ -59,22 +67,4 @@ export const errorHandler = (
       },
     });
   }
-};
-
-// Async handler wrapper to avoid try-catch blocks in routes
-export const asyncHandler = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};
-
-// Not Found Error Handler
-export const notFoundHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
-  res.status(404);
-  next(error);
 };
