@@ -68,3 +68,20 @@ export const errorHandler = (
     });
   }
 };
+
+export const asyncHandler = (fn: Function) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
+
+export const notFoundHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  error.name = "NotFoundError";
+  res.status(404);
+  next(error);
+};
